@@ -1,0 +1,23 @@
+[Unit]
+Description=Cuttlefish Host Orchestrator service
+After=network-online.target
+After=remote-fs.target
+Wants=network-online.target
+Wants=systemd-journal-gatewayd.service
+
+[Service]
+User=_cutf-operator
+Group=cvdnetwork
+EnvironmentFile=/etc/default/cuttlefish-host_orchestrator
+ExecStart=/usr/lib/cuttlefish-common/bin/host_orchestrator \
+  --discard-equal-empty \
+  --http_port=${orchestrator_http_port} \
+  --android_build_url=${orchestrator_android_build_url} \
+  --cvd_artifacts_dir=${orchestrator_cvd_artifacts_dir} \
+  --operator_http_port=${operator_http_port} \
+  --listen_addr=${orchestrator_listen_address}  \
+  --cvd_user=${orchestrator_cvd_user}
+
+[Install]
+WantedBy=multi-user.target
+

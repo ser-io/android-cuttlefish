@@ -12,6 +12,11 @@ case "$1" in
         usermod -a -G cvdnetwork,kvm _cvd-executor
     fi
 
+    # Directory used by HO to organize cvd's artifacts and runtimes directories.
+    name=/var/lib/cuttlefish-common
+    mkdir -p ${name}
+    chown _cutf-operator:cvdnetwork ${name}
+
     # Reload nginx having the orchestration configuration
     service nginx reload
 esac

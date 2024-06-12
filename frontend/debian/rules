@@ -36,10 +36,14 @@ override_dh_auto_test:
 	$(GOUTIL) $(OPERATOR_SOURCE_DIR) test ./...
 	dh_auto_test
 
+
 override_dh_installinit:
 	dh_installinit --name=cuttlefish-operator
-	dh_installinit --name=cuttlefish-host_orchestrator
 	dh_installinit
+
+override_dh_installsystemd:
+	dh_installsystemd --name=cuttlefish-host_orchestrator
+	dh_installsystemd
 
 override_dh_auto_clean:
 	rm -f $(ORCHESTRATOR_SOURCE_DIR)/host_orchestrator

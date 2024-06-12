@@ -25,6 +25,7 @@ import (
 	"os"
 	"os/user"
 	"path/filepath"
+	"regexp"
 	"sync"
 	"time"
 
@@ -99,7 +100,36 @@ func newOperatorProxy(port int) *httputil.ReverseProxy {
 	return httputil.NewSingleHostReverseProxy(operatorURL)
 }
 
+func containsStr(values []string, t string) bool {
+	for _, v := range values {
+		if v == t {
+			return true
+		}
+	}
+	return false
+}
+
+// Preprocesses args.
+//   - `--discard-equal-empty`: Remove args representing flags with empty assigned values, i.e: `--foo=`.
+func preprocessArgs() {
+	const discardEqualEmpty = "--discard-equal-empty"
+	if !containsStr(os.Args, discardEqualEmpty) {
+		return
+	}
+	re := regexp.MustCompile(`^--.*=$`)
+	result := []string{}
+	for _, v := range os.Args[1:] {
+		if v == discardEqualEmpty || re.Match([]byte(v)) {
+			continue
+		}
+		result = append(result, v)
+	}
+	os.Args = append(os.Args[:1], result...)
+}
+
 func main() {
+	preprocessArgs()
+
 	httpPort := flag.Int("http_port", 2081, "Port to listen on for HTTP requests.")
 	cvdUser := flag.String("cvd_user", "", "User to execute cvd as.")
 	operatorPort := flag.Int("operator_http_port", 1080, "Port where the operator is listening.")
